@@ -150,14 +150,14 @@ def give_treachery(n):
     if treachery_deck[selected_card] != 0:
         players[n].current_trech_c.append(selected_card)
         treachery_deck[selected_card] -= 1
-        players[n].current_trach_n = len(players[n].current_trech_c)
+        players[n].current_trech_n = len(players[n].current_trech_c)
     elif treachery_deck[selected_card] > 0:
         new_selected_card_index = random.choices(range(len(card_names)), weights=available_trech_probabilities, k=1)[0]
         selected_card = card_names[new_selected_card_index]
         print(f"Original card not available, selecting new card: {selected_card}")
         players[n].current_trech_c.append(selected_card)
         treachery_deck[selected_card] -= 1
-        players[n].current_trach_n = len(players[n].current_trech_c)
+        players[n].current_trech_n = len(players[n].current_trech_c)
 
 def is_player_faction(n,pic):
     if pic in traitor_deck_reg[players[n].name]:
@@ -182,7 +182,7 @@ class Faction:
         self.reserve = reserve
         self.start_spice = starting_spice
         self.current_spice = starting_spice
-        self.current_trach_n  = current_trech_n
+        self.current_trech_n  = current_trech_n
         self.max_trech = max_trech
         self.current_trech_c = []
         self.current_traitors_n = current_traitors_n
@@ -235,13 +235,13 @@ def distribute_cards():
     print("Distributing cards...")
     print("Trechery...")
     for n in range(0,len(players)):
-        while players[n].current_trach_n < 1:#players[n].max_trech:
+        while players[n].current_trech_n < 1:#players[n].max_trech:
             give_treachery(n)
         print("Traitors...")
         while players[n].current_traitors_n < 4:
             give_traitor(n)
             
-        print(f"{players[n].name} has : \n {players[n].current_trach_n} treachery cards ({players[n].current_trech_c}) \n {players[n].current_traitors_n} traitor cards ({players[n].current_traitors_c}).")
+        print(f"{players[n].name} has : \n {players[n].current_trech_n} treachery cards ({players[n].current_trech_c}) \n {players[n].current_traitors_n} traitor cards ({players[n].current_traitors_c}).")
     pick_traitor(n)
 
 def main():
