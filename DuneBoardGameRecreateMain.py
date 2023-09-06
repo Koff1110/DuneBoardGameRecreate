@@ -78,8 +78,7 @@ traitor_deck_ureg = {
     "Master Bewt": 3,
     "Soo Soo Suk": 2,
     "Guild Representative": 1,
-    "Cozmo" : 10,
-    "Cozmo" : 9
+    "Cozmo" : 10
 }
 
 treachery_deck = {
@@ -123,17 +122,30 @@ treachery_deck_probabilty = {
 
 
 def give_traitor(n):
-   card_names = list(traitor_deck_ureg.keys())
-   available_traitors = card_names[:]
+    card_names = list(traitor_deck_ureg.keys())
+    available_traitors = card_names[:]
    
-   if available_traitors:
-    selected_card = random.choice(available_traitors)
-    players[n].current_traitors_c.append(selected_card)
-    available_traitors.remove(selected_card)
-    del traitor_deck_ureg[selected_card]  # Remove the selected card from the deck
-    players[n].current_traitors_n = len(players[n].current_traitors_c)
-   else:
+    if available_traitors:
+         selected_card = random.choice(available_traitors)
+         players[n].current_traitors_c.append(selected_card)
+         available_traitors.remove(selected_card)
+         del traitor_deck_ureg[selected_card]  # Remove the selected card from the deck
+         players[n].current_traitors_n = len(players[n].current_traitors_c)
+    else:
         print("No traitor cards available.")
+        exit()
+        
+
+def pick_traitor(n):
+    print("Pick Traitor")
+    for n in range(0,len(players)):
+        picked_traitor = input(f"{players[n].name} Pick a traitor to keep: ")
+        while picked_traitor not in players[n].current_traitors_c:
+            picked_traitor = input("Please enter a valid Traitor: ")
+        while picked_traitor in list(traitor_deck_reg[players[n].name]):
+            picked_traitor = input("Please enter a valid Traitor not in your own faction: ")
+        players[n].current_traitors_c = picked_traitor
+    print(f"{players[n].name} Traitor is: {players[n].current_traitors_c}")
 
 def give_treachery(n):
     for c in treachery_deck:
@@ -157,21 +169,7 @@ def give_treachery(n):
         players[n].current_trech_c.append(selected_card)
         treachery_deck[selected_card] -= 1
 
-def is_player_faction(n,pic):
-    if pic in traitor_deck_reg[players[n].name]:
-        pic = input("Please enter a valid Traitor not in your own faction: ")
-        players[n].current_traitors_c = pic
 
-def pick_traitor(n):
-    print("Pick Traitor")
-    for n in range(0,len(players)):
-        pick_a_traitor = input(f"{players[n].name} Pick a traitor to keep: ")
-        while pick_a_traitor not in players[n].current_traitors_c:
-            pick_a_traitor = input("Please enter a valid Traitor: ")
-        while pick_a_traitor in traitor_deck_reg[players[n].name]:
-            pick_a_traitor = input("Please enter a Traitor not in your faction: ")
-        players[n].current_traitors_c = pick_a_traitor
-    print(f"{players[n].name} Traitor is: {players[n].current_traitors_c}")
 
 
 class Faction:
