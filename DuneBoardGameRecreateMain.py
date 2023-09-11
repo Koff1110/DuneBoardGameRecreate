@@ -3,6 +3,35 @@ import random
 #also Harc and Bene have Lady Margot when only harc should have
 decks = {"spice_deck" : 21, "treachery_deck" : 33, "traitor_deck" : 30, "storm_deck" : 6}
 
+phase =[
+    "Start",
+    "Storm",
+    "Spice Blow",
+    "Choam Charity",
+    "Bidding",
+    "Revival",
+    "Ship and Move",
+    "Battle",
+    "Spice Harvest",
+    "Mentant"
+ ]
+current_phase = phase[0]
+
+spice_deck ={
+    "place-1" : 2,
+    "place-2" : 2,
+    "place-3" : 2,
+    "place-4" : 1,
+    "place-5" : 1,
+    "place-6" : 2,
+    "place-7" : 4,
+    "place-8" : 4,
+    "place-9" : 6,
+    "place-10" : 8,
+}
+
+spiced_locations = []
+
 traitor_deck_reg = {
     "Atraides" : {
         "Dr.Yueh" : 1,
@@ -234,20 +263,41 @@ def distribute_cards():
         print(f"{players[n].name} has : \n {len(players[n].current_trech_c)} treachery cards ({players[n].current_trech_c}) \n {players[n].current_traitors_n} traitor cards ({players[n].current_traitors_c}).")
     pick_traitor(n)
 
+def draw_storm():
+    print("reading the wind...")
+    storm_card = random.randrange(0,6)
+    print(f"Storm moves {storm_card} sectors.")
+
+def draw_spice_blow():
+    print("feeling the rumble...")
+    card_name = dict(spice_deck)
+    available_locations = list(card_name.keys())
+    selected_blow = random.choice(available_locations)
+    spiced_locations.append(selected_blow)
+    print(f"Spice blow at {selected_blow} with {spice_deck[selected_blow]} spice.")
+    print(f"there is spice at :")
+    for l in range(len(spiced_locations)):
+        print(f"{spiced_locations[l]} : {spice_deck[spiced_locations[l]]} spice.")
+
 def bidding():
     print("bidding...")
 
-def main():
-    start_game = input("Start Game? y/n: ")
-    if start_game == "y":
-        player_count = int(input("How many players: "))
-        assign_factions(player_count)
-        distribute_cards()
-        
-    elif start_game == "n":
-        quit()
-    else:
+def main(current_phase):
+    if current_phase == "Start":
         start_game = input("Start Game? y/n: ")
+        if start_game == "y":
+            player_count = int(input("How many players: "))
+            assign_factions(player_count)
+            distribute_cards()
+        elif start_game == "n":
+            quit()
+        else:
+            start_game = input("Start Game? y/n: ")
+        current_phase = phase[1]
+    if current_phase == "Storm":
+        draw_storm()
+        current_phase = phase[2]
+    if current_phase == "Spice Blow":
+        draw_spice_blow()
 
-
-main()
+main(current_phase)
