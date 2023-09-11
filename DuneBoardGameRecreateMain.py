@@ -113,13 +113,6 @@ treachery_deck_probabilty = {
     "Truthtrance" : 2
 }
 
-#for c in treachery_deck:
-#    if treachery_deck[c] == 0:
-#        print("0")    
-#    else:
-#        treachery_deck_probabilty[c] = 100 * (treachery_deck[c] / (total_trech_cards - treachery_deck[c]))
-
-
 
 def give_traitor(n):
     card_names = list(traitor_deck_ureg.keys())
@@ -127,7 +120,9 @@ def give_traitor(n):
    
     if available_traitors:
          selected_card = random.choice(available_traitors)
-         players[n].current_traitors_c.append(selected_card)
+         for p in range(len(players)):
+            if selected_card in traitor_deck_reg[players[p].name]: #Makes sure selected traitor is in the game
+                players[n].current_traitors_c.append(selected_card)
          available_traitors.remove(selected_card)
          del traitor_deck_ureg[selected_card]  # Remove the selected card from the deck
          players[n].current_traitors_n = len(players[n].current_traitors_c)
@@ -238,6 +233,9 @@ def distribute_cards():
             
         print(f"{players[n].name} has : \n {len(players[n].current_trech_c)} treachery cards ({players[n].current_trech_c}) \n {players[n].current_traitors_n} traitor cards ({players[n].current_traitors_c}).")
     pick_traitor(n)
+
+def bidding():
+    print("bidding...")
 
 def main():
     start_game = input("Start Game? y/n: ")
