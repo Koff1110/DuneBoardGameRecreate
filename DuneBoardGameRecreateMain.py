@@ -267,14 +267,15 @@ def draw_storm():
     print("reading the wind...")
     storm_card = random.randrange(0,6)
     print(f"Storm moves {storm_card} sectors.")
-
+max_spice_blows = 2
 def draw_spice_blow():
     print("feeling the rumble...")
     card_name = dict(spice_deck)
     available_locations = list(card_name.keys())
-    selected_blow = random.choice(available_locations)
-    spiced_locations.append(selected_blow)
-    print(f"Spice blow at {selected_blow} with {spice_deck[selected_blow]} spice.")
+    for b in range(max_spice_blows):
+        selected_blow = random.choice(available_locations)
+        spiced_locations.append(selected_blow)
+        print(f"Spice blow at {selected_blow} with {spice_deck[selected_blow]} spice.")
     print(f"there is spice at :")
     for l in range(len(spiced_locations)):
         print(f"{spiced_locations[l]} : {spice_deck[spiced_locations[l]]} spice.")
