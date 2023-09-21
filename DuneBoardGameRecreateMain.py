@@ -1,5 +1,6 @@
 import random
-#random.seed("Test2") #Seed Test 2 give Emp a karma, Hark a karma, and Bene a karma because Ghola is not available which it should not
+import time
+random.seed("Test2") #Seed Test 2 give Emp a karma, Hark a karma, and Bene a karma because Ghola is not available which it should not
 #also Harc and Bene have Lady Margot when only harc should have
 decks = {"spice_deck" : 21, "treachery_deck" : 33, "traitor_deck" : 30, "storm_deck" : 6}
 
@@ -13,7 +14,7 @@ phase =[
     "Ship and Move",
     "Battle",
     "Spice Harvest",
-    "Mentant"
+    "Mentat"
  ]
 current_phase = phase[0]
 
@@ -171,7 +172,9 @@ def pick_traitor(n):
         players[n].current_traitors_c = picked_traitor
     print(f"{players[n].name} Traitor is: {players[n].current_traitors_c}")
 
-def give_treachery(n):
+card_names = []
+available_trech_probabilities = []
+def select_trechery():
     for c in treachery_deck:
         if treachery_deck[c] != 0:
             treachery_deck_probabilty[c] = 100 * (treachery_deck[c] / (total_trech_cards - treachery_deck[c]))
@@ -182,15 +185,20 @@ def give_treachery(n):
     
     selected_card_index = random.choices(range(len(card_names)), weights=available_trech_probabilities, k=1)[0]
     selected_card = card_names[selected_card_index]
-    
+    return selected_card
+
+def give_treachery(deck):
+
+    selected_card = select_trechery()
+
     if treachery_deck[selected_card] != 0:
-        players[n].current_trech_c.append(selected_card)
+        deck.append(selected_card)
         treachery_deck[selected_card] -= 1
     elif treachery_deck[selected_card] > 0:
         new_selected_card_index = random.choices(range(len(card_names)), weights=available_trech_probabilities, k=1)[0]
         selected_card = card_names[new_selected_card_index]
         print(f"Original card not available, selecting new card: {selected_card}")
-        players[n].current_trech_c.append(selected_card)
+        deck.append(selected_card)
         treachery_deck[selected_card] -= 1
 
 
@@ -255,7 +263,7 @@ def distribute_cards():
     print("Trechery...")
     for n in range(0,len(players)):
         while len(players[n].current_trech_c) < 1:#players[n].max_trech:
-            give_treachery(n)
+            give_treachery(players[n].current_trech_c)
         print("Traitors...")
         while players[n].current_traitors_n < 4:
             give_traitor(n)
@@ -267,23 +275,87 @@ def draw_storm():
     print("reading the wind...")
     storm_card = random.randrange(0,6)
     print(f"Storm moves {storm_card} sectors.")
+
+
 max_spice_blows = 2
-def draw_spice_blow():
+card_name = dict(spice_deck)
+available_locations = list(card_name.keys())
+
+def draw_spice_blow(available_locations):
     print("feeling the rumble...")
-    card_name = dict(spice_deck)
-    available_locations = list(card_name.keys())
-    for b in range(max_spice_blows):
-        selected_blow = random.choice(available_locations)
-        spiced_locations.append(selected_blow)
-        print(f"Spice blow at {selected_blow} with {spice_deck[selected_blow]} spice.")
+    if available_locations != []:
+        for b in range(max_spice_blows):
+            selected_blow = random.choice(available_locations)
+            if selected_blow not in spiced_locations:
+                spiced_locations.append(selected_blow)
+            available_locations.remove(selected_blow)
+            print(f"Spice blow at {selected_blow} with {spice_deck[selected_blow]} spice.")
+    elif available_locations == []:
+        print("spice deck empty...reshufling...")
     print(f"there is spice at :")
     for l in range(len(spiced_locations)):
         print(f"{spiced_locations[l]} : {spice_deck[spiced_locations[l]]} spice.")
 
+def choam_charity():
+    print("Choam Charity...")
+    for n in range(0,len(players)):
+        if players[n].current_spice < 2:
+            print(f"{players[n].name} says Choam Charity!")
+            players[n].current_spice = 2
+
+def get_highest_bidder(bid_list):
+    highest_bid = 0
+    highest_bidder = None
+    for player_name, bid_value in bid_list.items():
+        if bid_value > highest_bid:
+            highest_bidder = player_name
+            highest_bid = bid_value
+    return highest_bidder
+
+up_for_auction = []
+able_to_bid = []
 def bidding():
-    print("bidding...")
+    bids = {}  # Dictionary to store bids with player names
+    print('Bidding...')
+    up_for_auction.clear()
+    able_to_bid.clear()
+    bids_list = {}
+    winning_bidder = None
+    for n in range(0,len(players)):
+        if len(players[n].current_trech_c) < players[n].max_trech:
+            able_to_bid.append(players[n].name)
+            give_treachery(up_for_auction)
+            current_bid = int(input(f"{players[n].name} enter a bid "))
+            while current_bid < players[n].current_spice + 1:
+                while current_bid > players[n].current_spice or len(players[n].current_trech_c) == players[n].max_trech:
+                    current_bid = int(input("Do not enter more than your current spice."))
+                    if current_bid == 0:
+                        break
+                bids_list[players[n].name] = current_bid
+                winning_bidder = get_highest_bidder(bids_list)
+                winning_bidder_index = able_to_bid.index(winning_bidder)
+                break
+    
+    if winning_bidder != None and up_for_auction:
+        players[winning_bidder_index].current_trech_c.append(up_for_auction[0])
+        
+        players[winning_bidder_index].current_spice = players[winning_bidder_index].current_spice - current_bid
+        print(f"Auction has {up_for_auction} for sale")
+        print(bids_list)
+        print(winning_bidder_index)
+        print(f"{players[winning_bidder_index].name} has {players[winning_bidder_index].current_spice} spice.")
+        print(f"{players[winning_bidder_index].name} has {players[winning_bidder_index].current_trech_c}")
+    else:
+        print("No Bidders Tonight.")
+
+        
+game_end = False
+def mentat_pause():
+    if game_end == True:
+        exit()
 
 def main(current_phase):
+    current_turn = 1
     if current_phase == "Start":
         start_game = input("Start Game? y/n: ")
         if start_game == "y":
@@ -295,10 +367,44 @@ def main(current_phase):
         else:
             start_game = input("Start Game? y/n: ")
         current_phase = phase[1]
-    if current_phase == "Storm":
-        draw_storm()
-        current_phase = phase[2]
-    if current_phase == "Spice Blow":
-        draw_spice_blow()
-
+    
+    while current_turn != 11:
+        print(f"TURN {current_turn}")
+        if current_phase == "Storm":
+            #draw_storm()
+            current_phase = phase[2]
+            
+        if current_phase == "Spice Blow":
+            #draw_spice_blow(available_locations)
+            current_phase = phase[3]
+            
+        if current_phase == "Choam Charity":
+            choam_charity()
+            current_phase = phase[4]
+            time.sleep(1.2)
+        if current_phase == "Bidding":
+            bidding()
+            current_phase = phase[5]
+            
+        if current_phase == "Revival":
+            #print("Revival...")
+            current_phase = phase[6]
+            
+        if current_phase == "Ship and Move":
+            #print("Ship and Move...")
+            current_phase = phase[7]
+            
+        if current_phase == "Battle":
+            #print("Battle...")
+            current_phase = phase[8]
+            
+        if current_phase == "Spice Harvest":
+            #print("Spice Harvest...")
+            current_phase = phase[9]
+            
+        if current_phase == "Mentat":
+            mentat_pause()
+            current_phase = phase[1]
+            time.sleep(1)
+        current_turn += 1
 main(current_phase)
