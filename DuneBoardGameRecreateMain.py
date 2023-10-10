@@ -314,41 +314,40 @@ def get_highest_bidder(bid_list):
 
 up_for_auction = []
 able_to_bid = []
+
+def can_you_bid(n):
+    if len(players[n].current_trech_c) < players[n].max_trech:
+        able_to_bid.append(players[n].name)
+    print(able_to_bid)
+
 def bidding():
     bids = {}  # Dictionary to store bids with player names
     print('Bidding...')
     up_for_auction.clear()
-    able_to_bid.clear()
     bids_list = {}
+    actual_bid = 0
     winning_bidder = None
     for n in range(0,len(players)):
-        if len(players[n].current_trech_c) < players[n].max_trech:
-            able_to_bid.append(players[n].name)
-            give_treachery(up_for_auction)
-            current_bid = int(input(f"{players[n].name} enter a bid "))
-            while current_bid < players[n].current_spice + 1:
-                while current_bid > players[n].current_spice or len(players[n].current_trech_c) == players[n].max_trech:
-                    current_bid = int(input("Do not enter more than your current spice."))
-                    if current_bid == 0:
-                        break
-                bids_list[players[n].name] = current_bid
-                winning_bidder = get_highest_bidder(bids_list)
-                winning_bidder_index = able_to_bid.index(winning_bidder)
-                break
+        can_you_bid(n)
+    for x in range(0,len(able_to_bid)):
+        give_treachery(up_for_auction)
+        current_bid = int(input(f"{able_to_bid[x]} enter a bid "))
+        if current_bid > actual_bid:
+            actual_bid = current_bid
+            winning_bidder = able_to_bid[x]
     
-    if winning_bidder != None and up_for_auction:
+    if len(able_to_bid) != 0:
+        print(f"The Auction has {len(up_for_auction)} cards to bid for")
+        print(actual_bid)
+        print(winning_bidder)
+        winning_bidder_index = able_to_bid.index(winning_bidder)
         players[winning_bidder_index].current_trech_c.append(up_for_auction[0])
-        
-        players[winning_bidder_index].current_spice = players[winning_bidder_index].current_spice - current_bid
-        print(f"Auction has {up_for_auction} for sale")
-        print(bids_list)
-        print(winning_bidder_index)
-        print(f"{players[winning_bidder_index].name} has {players[winning_bidder_index].current_spice} spice.")
-        print(f"{players[winning_bidder_index].name} has {players[winning_bidder_index].current_trech_c}")
+        print(players[winning_bidder_index].current_trech_c)
     else:
-        print("No Bidders Tonight.")
+        print("No bidders today")
+    able_to_bid.clear()
 
-        
+
 game_end = False
 def mentat_pause():
     if game_end == True:
@@ -375,7 +374,7 @@ def main(current_phase):
             current_phase = phase[2]
             
         if current_phase == "Spice Blow":
-            #draw_spice_blow(available_locations)
+           # draw_spice_blow(available_locations)
             current_phase = phase[3]
             
         if current_phase == "Choam Charity":
@@ -387,19 +386,19 @@ def main(current_phase):
             current_phase = phase[5]
             
         if current_phase == "Revival":
-            #print("Revival...")
+          #  print("Revival...")
             current_phase = phase[6]
             
         if current_phase == "Ship and Move":
-            #print("Ship and Move...")
+          #  print("Ship and Move...")
             current_phase = phase[7]
             
         if current_phase == "Battle":
-            #print("Battle...")
+          #  print("Battle...")
             current_phase = phase[8]
             
         if current_phase == "Spice Harvest":
-            #print("Spice Harvest...")
+          #  print("Spice Harvest...")
             current_phase = phase[9]
             
         if current_phase == "Mentat":
