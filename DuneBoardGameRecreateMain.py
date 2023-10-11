@@ -1,6 +1,6 @@
 import random
 import time
-random.seed("Test2") #Seed Test 2 give Emp a karma, Hark a karma, and Bene a karma because Ghola is not available which it should not
+#random.seed("Test2") #Seed Test 2 give Emp a karma, Hark a karma, and Bene a karma because Ghola is not available which it should not
 #also Harc and Bene have Lady Margot when only harc should have
 decks = {"spice_deck" : 21, "treachery_deck" : 33, "traitor_deck" : 30, "storm_deck" : 6}
 
@@ -318,7 +318,6 @@ able_to_bid = []
 def can_you_bid(n):
     if len(players[n].current_trech_c) < players[n].max_trech:
         able_to_bid.append(players[n].name)
-    print(able_to_bid)
 
 def bidding():
     bids = {}  # Dictionary to store bids with player names
@@ -327,21 +326,30 @@ def bidding():
     bids_list = {}
     actual_bid = 0
     winning_bidder = None
+    passed_on_card = False
     for n in range(0,len(players)):
         can_you_bid(n)
+    print(able_to_bid)
     for x in range(0,len(able_to_bid)):
         give_treachery(up_for_auction)
-        current_bid = int(input(f"{able_to_bid[x]} enter a bid "))
-        if current_bid > actual_bid:
+        can_you_bid(n)
+        current_bid = int(input(f"{able_to_bid[x]}(spice: {players[x].current_spice}) enter a bid "))
+        while current_bid > players[x].current_spice and current_bid != 0:
+            current_bid = int(input(f"{able_to_bid[x]}(spice: {players[x].current_spice}) enter a bid less than your current spice ({players[x].current_spice}) "))
+        if current_bid > actual_bid and current_bid <= players[x].current_spice:
             actual_bid = current_bid
             winning_bidder = able_to_bid[x]
+            winning_bidder_index = able_to_bid.index(winning_bidder)
+        elif current_bid == 0 and actual_bid == 0:
+            passed_on_card = True
+            
     
-    if len(able_to_bid) != 0:
+    if len(able_to_bid) != 0 and passed_on_card == False:
         print(f"The Auction has {len(up_for_auction)} cards to bid for")
         print(actual_bid)
         print(winning_bidder)
-        winning_bidder_index = able_to_bid.index(winning_bidder)
-        players[winning_bidder_index].current_trech_c.append(up_for_auction[0])
+        players[winning_bidder_index].current_trech_c.append(up_for_auction[len(up_for_auction) - 1])
+        players[winning_bidder_index].current_spice -= actual_bid
         print(players[winning_bidder_index].current_trech_c)
     else:
         print("No bidders today")
@@ -369,38 +377,39 @@ def main(current_phase):
     
     while current_turn != 11:
         print(f"TURN {current_turn}")
+        time.sleep(2)
         if current_phase == "Storm":
-            #draw_storm()
+            draw_storm()
             current_phase = phase[2]
-            
+            #time.sleep(5)
         if current_phase == "Spice Blow":
-           # draw_spice_blow(available_locations)
+            draw_spice_blow(available_locations)
             current_phase = phase[3]
-            
+            #time.sleep(5)
         if current_phase == "Choam Charity":
             choam_charity()
             current_phase = phase[4]
-            time.sleep(1.2)
+            #time.sleep(5)
         if current_phase == "Bidding":
             bidding()
             current_phase = phase[5]
-            
+            #time.sleep(5)
         if current_phase == "Revival":
-          #  print("Revival...")
+            print("Revival...")
             current_phase = phase[6]
-            
+            #time.sleep(5)
         if current_phase == "Ship and Move":
-          #  print("Ship and Move...")
+            print("Ship and Move...")
             current_phase = phase[7]
-            
+            #time.sleep(5)
         if current_phase == "Battle":
-          #  print("Battle...")
+            print("Battle...")
             current_phase = phase[8]
-            
+            #time.sleep(5)
         if current_phase == "Spice Harvest":
-          #  print("Spice Harvest...")
+            print("Spice Harvest...")
             current_phase = phase[9]
-            
+            #time.sleep(5)
         if current_phase == "Mentat":
             mentat_pause()
             current_phase = phase[1]
