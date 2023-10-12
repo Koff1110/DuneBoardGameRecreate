@@ -39,11 +39,11 @@ sectors = {
     2 : ["place-4","place-5","place-6"],
     3 : ["place-7","place-8","place-9"],
     4 : ["place-10","place-11","place-12"],
-    5 : ["place-13","place-14","place-15"]
+    5 : ["place-13","place-14","place-15"],
+    6 : ["place-16","place-17","place-18"],
+    7 : ["place-19","place-20","place-21"]
 
 }
-
-spiced_locations = []
 
 traitor_deck_reg = {
     "Atraides" : {
@@ -300,29 +300,26 @@ def draw_storm(current_sector,deck):
     if new_sector == 0:
         new_sector = 5
     current_sector = sectors[new_sector]
-    print(current_sector)
-
     print(f"Storm moves {selected_storm_card} sectors.")
 
-
+available_locations = []
+spiced_locations = []
 max_spice_blows = 2
-card_name = dict(spice_deck)
-available_locations = list(card_name.keys())
-
+card_name = dict(sectors)
 def draw_spice_blow(available_locations):
     print("feeling the rumble...")
-    if available_locations != []:
-        for b in range(max_spice_blows):
-            selected_blow = random.choice(available_locations)
-            if selected_blow not in spiced_locations:
-                spiced_locations.append(selected_blow)
-            available_locations.remove(selected_blow)
-            print(f"Spice blow at {selected_blow} with {spice_deck[selected_blow]} spice.")
-    elif available_locations == []:
-        print("spice deck empty...reshufling...")
-    print(f"there is spice at :")
-    for l in range(len(spiced_locations)):
-        print(f"{spiced_locations[l]} : {spice_deck[spiced_locations[l]]} spice.")
+    copy_card_name = card_name.copy()
+    available_locations = random.choice(list(copy_card_name.values()))
+    print(copy_card_name)
+    for x in range(max_spice_blows):
+        selected_location = random.choice(available_locations)
+    if selected_location in spiced_locations:
+        selected_location = random.choice(available_locations)
+    else:    
+        spiced_locations.append(selected_location)
+        available_locations.remove(selected_location)
+        print(selected_location)
+    print(f"There is spice at {spiced_locations}.")
 
 def choam_charity():
     print("Choam Charity...")
