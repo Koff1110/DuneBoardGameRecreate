@@ -298,22 +298,22 @@ available_locations = []
 spiced_locations = []
 max_spice_blows = 2
 card_name = dict(sectors)
-print(card_name.keys())
+#print(card_name.keys())
 
 def draw_spice_blow(available_locations):
     print("feeling the rumble...")
     for blows in range(max_spice_blows):
         available_sectors = list(sectors.keys())
         chosen_sector = random.choice(available_sectors)
-        print(chosen_sector)
+        #print(chosen_sector)
         available_places = sectors[chosen_sector]
         while available_places == []:
-            print(f"{sectors[chosen_sector]} is empty...choosing new location")
+            #print(f"{sectors[chosen_sector]} is empty...choosing new location")
             chosen_sector = random.choice(available_sectors)
             available_places = sectors[chosen_sector]
         chosen_place = random.choice(available_places)
 
-        print(f"first selected location {chosen_place}")
+        #print(f"first selected location {chosen_place}")
         if chosen_place in spiced_locations:
             chosen_place = random.choice(available_places)
             print(f"seccond selected location {chosen_place}")
@@ -342,24 +342,28 @@ def get_highest_bidder(bid_list):
 up_for_auction = []
 able_to_bid = []
 
-def can_you_bid(n):
-    if len(players[n].current_trech_c) < players[n].max_trech:
-        able_to_bid.append(players[n].name)
-
+def can_you_bid():
+    for n in range(0, len(players)):
+        if len(players[n].current_trech_c) == players[n].max_trech:
+            print(f"{players[n].name} already has the maximum number of treachery cards and cannot bid.")
+            #able_to_bid.remove(players[n].name)
+        else:
+            able_to_bid.append(players[n].name)
+       
 def bidding():
     bids = {}  # Dictionary to store bids with player names
     print('Bidding...')
     up_for_auction.clear()
-    bids_list = {}
     actual_bid = 0
     winning_bidder = None
     passed_on_card = False
-    for n in range(0,len(players)):
-        can_you_bid(n)
+    
+    can_you_bid()    
     print(able_to_bid)
-    for x in range(0,len(able_to_bid)):
-        give_treachery(up_for_auction)
-        can_you_bid(n)
+    give_treachery(up_for_auction)
+    for x in range(0, len(able_to_bid)):  
+        print(up_for_auction)
+        can_you_bid()
         current_bid = int(input(f"{able_to_bid[x]}(spice: {players[x].current_spice}) enter a bid "))
         while current_bid > players[x].current_spice and current_bid != 0:
             current_bid = int(input(f"{able_to_bid[x]}(spice: {players[x].current_spice}) enter a bid less than your current spice ({players[x].current_spice}) "))
@@ -367,14 +371,11 @@ def bidding():
             actual_bid = current_bid
             winning_bidder = able_to_bid[x]
             winning_bidder_index = able_to_bid.index(winning_bidder)
-        elif current_bid == 0 and actual_bid == 0:
-            passed_on_card = True
-            
-    
-    if len(able_to_bid) != 0 and passed_on_card == False:
+
+    if winning_bidder:
         print(f"The Auction has {len(up_for_auction)} cards to bid for")
-        print(actual_bid)
-        print(winning_bidder)
+        # print(actual_bid)
+        print(f"{winning_bidder} has won the bid.")
         players[winning_bidder_index].current_trech_c.append(up_for_auction[len(up_for_auction) - 1])
         players[winning_bidder_index].current_spice -= actual_bid
         print(players[winning_bidder_index].current_trech_c)
