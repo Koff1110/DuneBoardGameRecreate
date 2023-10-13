@@ -19,8 +19,6 @@ phase =[
 current_phase = phase[0]
 
 
-
-
 spice_deck ={
     "place-1" : 2,
     "place-2" : 2,
@@ -155,7 +153,6 @@ treachery_deck_probabilty = {
     "Truthtrance" : 2
 }
 
-
 def give_traitor(n):
     card_names = list(traitor_deck_ureg.keys())
     available_traitors = card_names[:]
@@ -172,7 +169,6 @@ def give_traitor(n):
         print("No traitor cards available.")
         exit()
         
-
 def pick_traitor(n):
     print("Pick Traitor")
     for n in range(0,len(players)):
@@ -213,9 +209,6 @@ def give_treachery(deck):
         deck.append(selected_card)
         treachery_deck[selected_card] -= 1
 
-
-
-
 class Faction:
     def __init__(self, name, starting_spice, reserve,max_trech,current_traitors_n,current_trech_c,current_traitors_c,max_traitors):
         self.name = name
@@ -228,7 +221,6 @@ class Faction:
         self.max_traitors = max_traitors
         self.current_traitors_c = []
        
-
 factlist = [
     Faction("Atraides", starting_spice=10, reserve=10,
             max_trech = 4, current_trech_c = "",
@@ -254,7 +246,6 @@ factlist = [
             max_trech = 4, current_trech_c = "",
             max_traitors = 1, current_traitors_n = 0, current_traitors_c = "")
 ]
-
 
 players = [] #stores players and their faction?
 
@@ -283,6 +274,7 @@ def distribute_cards():
         print(f"{players[n].name} has : \n {len(players[n].current_trech_c)} treachery cards ({players[n].current_trech_c}) \n {players[n].current_traitors_n} traitor cards ({players[n].current_traitors_c}).")
     pick_traitor(n)
 
+
 storm_cards = [1,2,3,4,5,6]
 def draw_storm(current_sector,deck):
     print("reading the wind...")
@@ -306,19 +298,29 @@ available_locations = []
 spiced_locations = []
 max_spice_blows = 2
 card_name = dict(sectors)
+print(card_name.keys())
+
 def draw_spice_blow(available_locations):
     print("feeling the rumble...")
-    copy_card_name = card_name.copy()
-    available_locations = random.choice(list(copy_card_name.values()))
-    print(copy_card_name)
-    for x in range(max_spice_blows):
-        selected_location = random.choice(available_locations)
-    if selected_location in spiced_locations:
-        selected_location = random.choice(available_locations)
-    else:    
-        spiced_locations.append(selected_location)
-        available_locations.remove(selected_location)
-        print(selected_location)
+    for blows in range(max_spice_blows):
+        available_sectors = list(sectors.keys())
+        chosen_sector = random.choice(available_sectors)
+        print(chosen_sector)
+        available_places = sectors[chosen_sector]
+        while available_places == []:
+            print(f"{sectors[chosen_sector]} is empty...choosing new location")
+            chosen_sector = random.choice(available_sectors)
+            available_places = sectors[chosen_sector]
+        chosen_place = random.choice(available_places)
+
+        print(f"first selected location {chosen_place}")
+        if chosen_place in spiced_locations:
+            chosen_place = random.choice(available_places)
+            print(f"seccond selected location {chosen_place}")
+        else:
+            spiced_locations.append(chosen_place)
+            available_places.remove(chosen_place)
+            print(chosen_place)
     print(f"There is spice at {spiced_locations}.")
 
 def choam_charity():
@@ -399,10 +401,10 @@ def main(current_phase):
         else:
             start_game = input("Start Game? y/n: ")
         #choosing the first storm starting location
-        rand_sector = random.randrange(1,len(sectors))
-        current_sector = rand_sector
-        print(current_sector)
-        current_phase = phase[1]
+    rand_sector = random.randrange(1,len(sectors))
+    current_sector = rand_sector
+    print(current_sector)
+    current_phase = phase[1]
     
     while current_turn != 11:
         print(f"TURN {current_turn}")
@@ -444,4 +446,5 @@ def main(current_phase):
             current_phase = phase[1]
             #time.sleep(1)
         current_turn += 1
+
 main(current_phase)
