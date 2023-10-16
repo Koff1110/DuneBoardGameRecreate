@@ -1,5 +1,6 @@
 import random
 import time
+import copy
 #random.seed("Test2") #Seed Test 2 give Emp a karma, Hark a karma, and Bene a karma because Ghola is not available which it should not
 #also Harc and Bene have Lady Margot when only harc should have
 decks = {"spice_deck" : 21, "treachery_deck" : 33, "traitor_deck" : 30, "storm_deck" : 6}
@@ -39,9 +40,16 @@ sectors = {
     4 : ["place-10","place-11","place-12"],
     5 : ["place-13","place-14","place-15"],
     6 : ["place-16","place-17","place-18"],
-    7 : ["place-19","place-20","place-21"]
+    7 : ["place-19","place-20","place-21"],
+    8 : ["place-22","place-23","place-24"],
+    9 : ["place-25","place-26","place-27"],
+    10 : ["place-28","place-29","place-30"],
+    11 : ["place-31","place-32","place-33"],
+    12 : ["place-34","place-35","place-36"],
 
 }
+
+untouch_sectors = copy.deepcopy(sectors)
 
 traitor_deck_reg = {
     "Atraides" : {
@@ -274,9 +282,13 @@ def distribute_cards():
         print(f"{players[n].name} has : \n {len(players[n].current_trech_c)} treachery cards ({players[n].current_trech_c}) \n {players[n].current_traitors_n} traitor cards ({players[n].current_traitors_c}).")
     pick_traitor(n)
 
-
 storm_cards = [1,2,3,4,5,6]
-def draw_storm(current_sector,deck):
+def draw_storm(current_turn,current_sector,deck,spice_locals,untouch_sectors):
+    if current_turn == 1:
+        #choosing the first storm starting location
+        rand_sector = random.randrange(1,13)
+        current_sector = rand_sector
+        print(f"main set current sector {current_sector}")
     print("reading the wind...")
     
     if not deck :
@@ -284,23 +296,50 @@ def draw_storm(current_sector,deck):
         deck = [1,2,3,4,5,6]
     
     selected_storm_card = random.choice(deck)
-    
     deck.remove(selected_storm_card)
-
-    new_sector = current_sector + selected_storm_card
-    new_sector = new_sector % 5
+    
+    new_sector = (current_sector + selected_storm_card ) % 12
+    print(f"{current_sector} + {selected_storm_card} % 12 == {new_sector}")
     if new_sector == 0:
-        new_sector = 5
-    current_sector = sectors[new_sector]
-    print(f"Storm moves {selected_storm_card} sectors.")
+        new_sector = 12
+    current_sector = new_sector
 
-available_locations = []
+    print(f"Storm moves {selected_storm_card} sectors.")
+    print(f"Storm is now at sector: {new_sector}")
+
+    spice_locals_copy = spice_locals.copy()
+    
+    sect_storm_passed_through = []
+    for n in range(selected_storm_card):
+        storm_passed = (new_sector - n) % 12
+        if storm_passed == 0:
+            storm_passed = 12
+        sect_storm_passed_through.append(storm_passed)
+    print(sect_storm_passed_through)
+
+    places_to_remove = []
+
+    for s in range(len(spice_locals_copy)):
+        if spice_locals_copy != []:
+            print(spice_locals_copy[s])
+            for x in range(len(sect_storm_passed_through)):
+                if spice_locals_copy[s] in untouch_sectors[sect_storm_passed_through[x]]:
+                    #print(sect_storm_passed_through[x])
+                    print(f"should remove {spice_locals_copy[s]}")
+                    places_to_remove.append(spice_locals_copy[s])
+    
+    for places in places_to_remove:
+        spice_locals_copy.remove(places)
+    return current_sector
+
+
 spiced_locations = []
+available_sectors = []
 max_spice_blows = 2
 card_name = dict(sectors)
+chosen_sector = 0
 #print(card_name.keys())
-
-def draw_spice_blow(available_locations):
+def draw_spice_blow(storm_sector):
     print("feeling the rumble...")
     for blows in range(max_spice_blows):
         available_sectors = list(sectors.keys())
@@ -308,13 +347,13 @@ def draw_spice_blow(available_locations):
         #print(chosen_sector)
         available_places = sectors[chosen_sector]
         while available_places == []:
-            #print(f"{sectors[chosen_sector]} is empty...choosing new location")
+            #print(f"{chosen_sector} is empty or storm blocked...choosing new location")
             chosen_sector = random.choice(available_sectors)
             available_places = sectors[chosen_sector]
         chosen_place = random.choice(available_places)
 
         #print(f"first selected location {chosen_place}")
-        if chosen_place in spiced_locations:
+        if chosen_place in spiced_locations or chosen_sector == storm_sector:
             chosen_place = random.choice(available_places)
             print(f"seccond selected location {chosen_place}")
         else:
@@ -388,8 +427,8 @@ game_end = False
 def mentat_pause():
     if game_end == True:
         exit()
-
-def main(current_phase):
+current_sector = random.randrange(1, 12)
+def main(current_phase,current_sector):
     current_turn = 1
     if current_phase == "Start":
         start_game = input("Start Game? y/n: ")
@@ -401,51 +440,49 @@ def main(current_phase):
             quit()
         else:
             start_game = input("Start Game? y/n: ")
-        #choosing the first storm starting location
-    rand_sector = random.randrange(1,len(sectors))
-    current_sector = rand_sector
-    print(current_sector)
+        
     current_phase = phase[1]
     
     while current_turn != 11:
         print(f"TURN {current_turn}")
             #time.sleep(2)
         if current_phase == "Storm":
-            draw_storm(current_sector,storm_cards)
+             # Update current_sector with the returned value
+            current_sector = draw_storm(current_turn, current_sector, storm_cards, spiced_locations, untouch_sectors)
             current_phase = phase[2]
             #time.sleep(2)
         if current_phase == "Spice Blow":
-            draw_spice_blow(available_locations)
+            draw_spice_blow(current_sector)
             current_phase = phase[3]
             #time.sleep(2)
         if current_phase == "Choam Charity":
-            choam_charity()
+            #choam_charity()
             current_phase = phase[4]
             #time.sleep(2)
         if current_phase == "Bidding":
-            bidding()
+           # bidding()
             current_phase = phase[5]
             #time.sleep(2)
         if current_phase == "Revival":
-            print("Revival...")
+            #print("Revival...")
             current_phase = phase[6]
             #time.sleep(2)
         if current_phase == "Ship and Move":
-            print("Ship and Move...")
+            #print("Ship and Move...")
             current_phase = phase[7]
             #time.sleep(2)
         if current_phase == "Battle":
-            print("Battle...")
+            #print("Battle...")
             current_phase = phase[8]
             #time.sleep(2)
         if current_phase == "Spice Harvest":
-            print("Spice Harvest...")
+            #print("Spice Harvest...")
             current_phase = phase[9]
             #time.sleep(2)
         if current_phase == "Mentat":
-            mentat_pause()
+            #mentat_pause()
             current_phase = phase[1]
             #time.sleep(1)
         current_turn += 1
 
-main(current_phase)
+main(current_phase,current_sector)
