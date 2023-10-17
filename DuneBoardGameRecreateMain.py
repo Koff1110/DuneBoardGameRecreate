@@ -299,7 +299,7 @@ def draw_storm(current_turn,current_sector,deck,spice_locals,untouch_sectors):
     deck.remove(selected_storm_card)
     
     new_sector = (current_sector + selected_storm_card ) % 12
-    print(f"{current_sector} + {selected_storm_card} % 12 == {new_sector}")
+    #print(f"{current_sector} + {selected_storm_card} % 12 == {new_sector}")
     if new_sector == 0:
         new_sector = 12
     current_sector = new_sector
@@ -315,7 +315,7 @@ def draw_storm(current_turn,current_sector,deck,spice_locals,untouch_sectors):
         if storm_passed == 0:
             storm_passed = 12
         sect_storm_passed_through.append(storm_passed)
-    print(sect_storm_passed_through)
+    #print(sect_storm_passed_through)
 
     places_to_remove = []
 
@@ -329,7 +329,7 @@ def draw_storm(current_turn,current_sector,deck,spice_locals,untouch_sectors):
                     places_to_remove.append(spice_locals_copy[s])
     
     for places in places_to_remove:
-        spice_locals_copy.remove(places)
+        spice_locals.remove(places)
     return current_sector
 
 
@@ -445,44 +445,44 @@ def main(current_phase,current_sector):
     
     while current_turn != 11:
         print(f"TURN {current_turn}")
-            #time.sleep(2)
+        time.sleep(1)
         if current_phase == "Storm":
              # Update current_sector with the returned value
             current_sector = draw_storm(current_turn, current_sector, storm_cards, spiced_locations, untouch_sectors)
             current_phase = phase[2]
-            #time.sleep(2)
+            time.sleep(.2)
         if current_phase == "Spice Blow":
             draw_spice_blow(current_sector)
             current_phase = phase[3]
-            #time.sleep(2)
+            time.sleep(.2)
         if current_phase == "Choam Charity":
-            #choam_charity()
+            choam_charity()
             current_phase = phase[4]
-            #time.sleep(2)
+            time.sleep(.2)
         if current_phase == "Bidding":
-           # bidding()
+            bidding()
             current_phase = phase[5]
-            #time.sleep(2)
+            time.sleep(.2)
         if current_phase == "Revival":
-            #print("Revival...")
+            print("Revival...")
             current_phase = phase[6]
-            #time.sleep(2)
+            time.sleep(.2)
         if current_phase == "Ship and Move":
-            #print("Ship and Move...")
+            print("Ship and Move...")
             current_phase = phase[7]
-            #time.sleep(2)
+            time.sleep(.2)
         if current_phase == "Battle":
-            #print("Battle...")
+            print("Battle...")
             current_phase = phase[8]
-            #time.sleep(2)
+            time.sleep(.2)
         if current_phase == "Spice Harvest":
-            #print("Spice Harvest...")
+            print("Spice Harvest...")
             current_phase = phase[9]
-            #time.sleep(2)
+            time.sleep(.2)
         if current_phase == "Mentat":
-            #mentat_pause()
+            mentat_pause()
             current_phase = phase[1]
-            #time.sleep(1)
+            time.sleep(1)
         current_turn += 1
 
 main(current_phase,current_sector)
