@@ -440,6 +440,8 @@ def ship_and_move(untouch_sectors):
         ship_location = input(f"{faction_name} chose a location to ship to: ")
         valid_location = False
 
+
+        #Shiping Part...
         while not valid_location:
             for sector, locations in untouch_sectors.items():
                 if ship_location in locations:
@@ -471,6 +473,8 @@ def ship_and_move(untouch_sectors):
                     occupied_locations[ship_location] = {faction_name: units_to_ship}
                     break
 
+        #Moving Part...
+        
         print(occupied_locations)
 
 
