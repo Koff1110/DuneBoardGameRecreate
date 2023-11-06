@@ -1,7 +1,7 @@
 import random
 import time
 import copy
-#random.seed("Test2") #Seed Test 2 give Emp a karma, Hark a karma, and Bene a karma because Ghola is not available which it should not
+random.seed("Test2") #Seed Test 2 give Emp a karma, Hark a karma, and Bene a karma because Ghola is not available which it should not
 #also Harc and Bene have Lady Margot when only harc should have
 decks = {"spice_deck" : 21, "treachery_deck" : 33, "traitor_deck" : 30, "storm_deck" : 6}
 
@@ -164,7 +164,7 @@ treachery_deck_probabilty = {
 def give_traitor(n):
     card_names = list(traitor_deck_ureg.keys())
     available_traitors = card_names[:]
-   
+
     if available_traitors:
          selected_card = random.choice(available_traitors)
          for p in range(len(players)):
@@ -181,10 +181,13 @@ def pick_traitor(n):
     print("Pick Traitor")
     for n in range(0,len(players)):
         picked_traitor = input(f"{players[n].name} Pick a traitor to keep: ")
+        picked_traitor = picked_traitor.title()
         while picked_traitor not in players[n].current_traitors_c:
             picked_traitor = input("Please enter a valid Traitor: ")
+            picked_traitor = picked_traitor.title()
         while picked_traitor in list(traitor_deck_reg[players[n].name]):
             picked_traitor = input("Please enter a valid Traitor not in your own faction: ")
+            picked_traitor = picked_traitor.title()
         players[n].current_traitors_c = picked_traitor
     print(f"{players[n].name} Traitor is: {players[n].current_traitors_c}")
 
@@ -422,6 +425,60 @@ def bidding():
         print("No bidders today")
     able_to_bid.clear()
 
+dead_units = {}
+def revival():
+    print("Revival...")
+    if not dead_units:
+        print("No dead units")
+
+occupied_locations = {}
+def ship_and_move(untouch_sectors):
+    print("Ship and Move...")
+    
+    for x in range(len(players)):
+        faction_name = players[x].name
+        ship_location = input(f"{faction_name} chose a location to ship to: ")
+        valid_location = False
+
+        while not valid_location:
+            for sector, locations in untouch_sectors.items():
+                if ship_location in locations:
+                    valid_location = True
+                    break
+            if not valid_location:
+                ship_location = input("Enter a valid location: ")
+            
+            units_to_ship = int(input(f"How many units from {faction_name} to ship to {ship_location}: "))
+            while players[x].reserve - units_to_ship < 0:
+                units_to_ship = int(input(f"Enter a valid number of units: "))
+            players[x].reserve -= units_to_ship
+            print(players[x].reserve)
+            
+            while True:
+                if ship_location in occupied_locations:
+                # If the location exists, add the new faction's units to it
+                    if faction_name in occupied_locations[ship_location]:
+                        occupied_locations[ship_location][faction_name] += units_to_ship
+                        break
+                    else:
+                        # If the faction is not in the location, create a new entry
+                        if len(occupied_locations[ship_location]) < 2:
+                            occupied_locations[ship_location][faction_name] = units_to_ship
+                        else:
+                            ship_location = input("Enter a new location: ")
+                else:
+                    # If the location does not exist, create a new entry with the faction and units
+                    occupied_locations[ship_location] = {faction_name: units_to_ship}
+                    break
+
+        print(occupied_locations)
+
+
+def battle():
+    print("Battle...")
+
+def spice_harvest():
+    print("Spice Harvest...")
 
 game_end = False
 def mentat_pause():
@@ -452,31 +509,31 @@ def main(current_phase,current_sector):
             current_phase = phase[2]
             time.sleep(.2)
         if current_phase == "Spice Blow":
-            draw_spice_blow(current_sector)
+            #draw_spice_blow(current_sector)
             current_phase = phase[3]
             time.sleep(.2)
         if current_phase == "Choam Charity":
-            choam_charity()
+           # choam_charity()
             current_phase = phase[4]
             time.sleep(.2)
         if current_phase == "Bidding":
-            bidding()
+           # bidding()
             current_phase = phase[5]
             time.sleep(.2)
         if current_phase == "Revival":
-            print("Revival...")
+           # revival()
             current_phase = phase[6]
             time.sleep(.2)
         if current_phase == "Ship and Move":
-            print("Ship and Move...")
+            ship_and_move(untouch_sectors)
             current_phase = phase[7]
             time.sleep(.2)
         if current_phase == "Battle":
-            print("Battle...")
+            battle()
             current_phase = phase[8]
             time.sleep(.2)
         if current_phase == "Spice Harvest":
-            print("Spice Harvest...")
+            spice_harvest()
             current_phase = phase[9]
             time.sleep(.2)
         if current_phase == "Mentat":
