@@ -1,7 +1,7 @@
 import random
 import time
 import copy
-random.seed("Test2") #Seed Test 2 give Emp a karma, Hark a karma, and Bene a karma because Ghola is not available which it should not
+#random.seed("Test2") #Seed Test 2 give Emp a karma, Hark a karma, and Bene a karma because Ghola is not available which it should not
 #also Harc and Bene have Lady Margot when only harc should have
 decks = {"spice_deck" : 21, "treachery_deck" : 33, "traitor_deck" : 30, "storm_deck" : 6}
 
@@ -432,6 +432,26 @@ def revival():
         print("No dead units")
 
 occupied_locations = {}
+
+def is_location_valid(ship_location,faction_name,units_to_ship):
+    while True:
+            if ship_location in occupied_locations:
+            # If the location exists, add the new faction's units to it
+                if faction_name in occupied_locations[ship_location]:
+                    occupied_locations[ship_location][faction_name] += units_to_ship
+                    break
+                else:
+                    # If the faction is not in the location, create a new entry
+                    if len(occupied_locations[ship_location]) < 2:
+                        occupied_locations[ship_location][faction_name] = units_to_ship
+                    else:
+                        ship_location = input("Enter a new location: ")
+            else:
+                # If the location does not exist, create a new entry with the faction and units
+                occupied_locations[ship_location] = {faction_name: units_to_ship} #idk why needed
+                break
+
+
 def ship_and_move(untouch_sectors):
     print("Ship and Move...")
     
@@ -456,26 +476,26 @@ def ship_and_move(untouch_sectors):
             players[x].reserve -= units_to_ship
             print(players[x].reserve)
             
-            while True:
-                if ship_location in occupied_locations:
-                # If the location exists, add the new faction's units to it
-                    if faction_name in occupied_locations[ship_location]:
-                        occupied_locations[ship_location][faction_name] += units_to_ship
-                        break
-                    else:
-                        # If the faction is not in the location, create a new entry
-                        if len(occupied_locations[ship_location]) < 2:
-                            occupied_locations[ship_location][faction_name] = units_to_ship
-                        else:
-                            ship_location = input("Enter a new location: ")
-                else:
-                    # If the location does not exist, create a new entry with the faction and units
-                    occupied_locations[ship_location] = {faction_name: units_to_ship}
-                    break
-
-        #Moving Part...
+            is_location_valid(ship_location,faction_name,units_to_ship)
         
         print(occupied_locations)
+        
+        #Moving Part...
+        first_location = ""
+        
+        seccond_location = ""
+        first_location = input(f"{faction_name} select place to move from ")
+        unit_move_amount = int(input(f"select how many units to move "))
+        seccond_location = input(f"Where do you want to move them ")
+        while True:
+            if faction_name in occupied_locations[first_location]:
+                is_location_valid(seccond_location,faction_name,unit_move_amount)
+                occupied_locations[first_location][faction_name] -= unit_move_amount
+                if occupied_locations[first_location][faction_name] == 0:
+                    del(occupied_locations[first_location][faction_name])
+                break
+        print(occupied_locations)
+        
 
 
 def battle():
